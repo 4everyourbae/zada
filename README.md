@@ -9,7 +9,20 @@ dashboard web di `localhost:8421`.
 Butuh **Python 3.10+** dan **Google Chrome** terpasang. 9router harus sudah
 pernah dijalankan (Zada membaca kredensial CLI 9router dari `%APPDATA%\9router`).
 
-Install langsung dari GitHub:
+### Lewat npm (disarankan)
+
+```bash
+npm install -g @lexxybrian/zada
+```
+
+Saat install, komponen Python ikut dipasang otomatis. Perintah `zada` langsung
+tersedia di terminal. Untuk update:
+
+```bash
+npm install -g @lexxybrian/zada@latest
+```
+
+### Lewat pip (alternatif)
 
 ```bash
 pip install git+https://github.com/4everyourbae/zada.git
