@@ -41,7 +41,7 @@ PROVIDER = "antigravity"
 SKIP_EXISTING = True       # lewati akun yang sudah punya koneksi antigravity
 CONSENT_TIMEOUT = 150      # detik; dinaikkan karena 3 Chrome paralel saling rebutan
 HTTP_TIMEOUT = 30
-PARALLEL_WORKERS = 3       # jumlah Chrome yang jalan bersamaan
+PARALLEL_WORKERS = 1       # jumlah Chrome yang jalan bersamaan (default 1 = paling stabil)
 
 APPDATA = os.environ.get("APPDATA", "")
 ROUTER_DATA_DIR = os.path.join(APPDATA, "9router")

@@ -14,8 +14,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet" />
-<link rel="stylesheet" href="/static/pet.css?v=17" />
-<script src="/static/app.js?v=17"></script>
+<link rel="stylesheet" href="/static/pet.css?v=18" />
+<script src="/static/app.js?v=18"></script>
   <style>
     body {
       font-family: 'Instrument Sans', system-ui, sans-serif;
@@ -201,6 +201,10 @@
         <div class="flex items-center justify-between mb-4 rise d4">
           <span class="text-sm t-muted" x-text="accounts.length + ' connections registered'"></span>
           <div class="flex items-center gap-2">
+            <a href="https://discord.gg/zhP6vhfzAQ" target="_blank" rel="noopener"
+              class="zbtn px-3 py-1.5 text-sm flex items-center gap-1.5" style="background:var(--clay);color:#fff">
+              <span>&#128722;</span> Buy account
+            </a>
             <button @click="testAll()" :disabled="testingAll || accounts.length===0"
               class="zbtn zbtn-ghost px-3 py-1.5 text-sm flex items-center gap-1.5">
               <span :class="testingAll && 'spin'">&#10227;</span> <span

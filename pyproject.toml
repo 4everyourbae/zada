@@ -1,11 +1,11 @@
-[build-system]
+﻿[build-system]
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "zada"
 version = "1.0.0"
-description = "Zada — Claude Companion control panel for 9router + Antigravity"
+description = "Zada â€” Claude Companion control panel for 9router + Antigravity"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -30,8 +30,8 @@ dependencies = [
 zada = "zada.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/USERNAME/zada"
-Issues = "https://github.com/USERNAME/zada/issues"
+Homepage = "https://github.com/4everyourbae/zada"
+Issues = "https://github.com/4everyourbae/zada/issues"
 
 [tool.setuptools]
 packages = ["zada"]

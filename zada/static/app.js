@@ -20,7 +20,7 @@ function zada() {
     running: false,
     current: "",
     statusLine: "",
-    workers: 3,
+    workers: 1,
     petState: "idle",
     bubble: "",
     displayTotal: 0,

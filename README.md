@@ -1,4 +1,4 @@
-# Zada — Claude Companion
+﻿# Zada â€” Claude Companion
 
 Control panel lokal untuk mengelola akun **9router + Antigravity**: login Gmail
 otomatis, daftar OAuth Antigravity, cek credit/quota, dan kelola koneksi lewat
@@ -12,13 +12,13 @@ pernah dijalankan (Zada membaca kredensial CLI 9router dari `%APPDATA%\9router`)
 Install langsung dari GitHub:
 
 ```bash
-pip install git+https://github.com/USERNAME/zada.git
+pip install git+https://github.com/4everyourbae/zada.git
 ```
 
 Perintah `zada` otomatis terdaftar di PATH. Untuk update ke versi terbaru:
 
 ```bash
-pip install --upgrade git+https://github.com/USERNAME/zada.git
+pip install --upgrade git+https://github.com/4everyourbae/zada.git
 ```
 
 ## Pemakaian
@@ -29,10 +29,10 @@ Cukup ketik di terminal/CMD:
 zada
 ```
 
-Lalu pilih dengan panah ↑/↓:
+Lalu pilih dengan panah â†‘/â†“:
 
-- **Run in this terminal** — jalankan dashboard di foreground, browser kebuka otomatis.
-- **Run in background** — jalankan di system tray (ikon Claude pet).
+- **Run in this terminal** â€” jalankan dashboard di foreground, browser kebuka otomatis.
+- **Run in background** â€” jalankan di system tray (ikon Claude pet).
 - **Quit**
 
 Argumen langsung juga didukung:
@@ -71,7 +71,7 @@ Bisa juga diedit langsung dari dashboard.
 ## Pengembangan
 
 ```bash
-git clone https://github.com/USERNAME/zada.git
+git clone https://github.com/4everyourbae/zada.git
 cd zada
 pip install -e .
 zada

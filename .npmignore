@@ -1,0 +1,25 @@
+# Python build artifacts / cache (jangan ikut ke paket npm)
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Data & rahasia (harusnya di %APPDATA%\zada, jaga-jaga)
+accounts.txt
+cookies/
+profiles/
+*.log
+
+# Repo app folder (kosong / bukan bagian paket)
+app/
+zada.egg-info/
+
+# Misc
+.git/
+.venv/
+venv/
+env/
+.DS_Store
+Thumbs.db
