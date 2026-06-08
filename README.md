@@ -94,5 +94,4 @@ zada
 
 `accounts.txt`, `cookies/`, dan `profiles/` berisi kredensial dan sesi login.
 Semuanya disimpan lokal di mesin kamu dan tidak pernah dikirim ke mana pun
-selain server 9router lokal (`127.0.0.1:20128`). Jangan commit file-file ini
-ke git (sudah diabaikan via `.gitignore`).
+selain server 9router lokal (`127.0.0.1:20128`).
