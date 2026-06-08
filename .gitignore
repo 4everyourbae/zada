@@ -1,0 +1,28 @@
+# Zada — keep secrets and runtime data out of git
+#
+# Note: user data (accounts.txt, cookies/, profiles/, logs) now lives in
+# %APPDATA%\zada (per-user), NOT in the repo. These entries are kept just in
+# case someone runs an old layout or drops test data in the project folder.
+
+# Account credentials / runtime data
+accounts.txt
+cookies/
+profiles/
+*.log
+
+# Python build artifacts
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# OS
+Thumbs.db
+.DS_Store

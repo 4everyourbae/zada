@@ -1,0 +1,574 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zada · Claude Companion</title>
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='52' r='40' fill='%23C96442'/%3E%3Ccircle cx='38' cy='48' r='5' fill='%231A1915'/%3E%3Ccircle cx='62' cy='48' r='5' fill='%231A1915'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+<link rel="stylesheet" href="/static/pet.css?v=17" />
+<script src="/static/app.js?v=17"></script>
+  <style>
+    body {
+      font-family: 'Instrument Sans', system-ui, sans-serif;
+    }
+
+    [x-cloak] {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body class="t-night" x-data="zada()" x-init="init()" :class="theme==='night' ? 't-night' : 't-claude'">
+  <!-- living background -->
+  <div class="bg-stage">
+    <div class="bg-mesh"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="bg-grain"></div>
+  </div>
+
+  <div class="layer min-h-screen md:flex max-w-[1500px] mx-auto">
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="md:w-[17rem] shrink-0 md:h-screen md:sticky md:top-0 px-6 py-7 flex flex-col md:border-r slide-l"
+      style="border-color:var(--line)">
+      <div class="flex items-center gap-3 mb-9">
+        <div class="zada zada-float zada-blink-host" style="width:46px;height:46px" :class="petStateClass">
+          <svg class="zada-svg" viewBox="0 0 120 120" width="100%" height="100%" aria-label="Zada">
+            <g class="z-body">
+              <g class="z-core">
+                <path d="M60 16 C86 16 100 36 100 62 C100 90 84 108 60 108 C36 108 20 90 20 62 C20 36 34 16 60 16 Z"
+                  fill="var(--clay)" />
+                <g>
+                  <circle class="z-eye" cx="48" cy="60" r="6.5" fill="#1A1915" />
+                  <circle class="z-eye" cx="72" cy="60" r="6.5" fill="#1A1915" />
+                </g>
+                <path d="M50 76 Q60 84 70 76" stroke="#1A1915" stroke-width="3.4" fill="none" stroke-linecap="round" />
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="leading-tight">
+          <div class="font-serif text-xl t-ink tracking-tight">Zada</div>
+          <div class="mono-label t-clay">Automation Tools</div>
+        </div>
+      </div>
+
+      <nav class="flex md:flex-col gap-0.5 overflow-x-auto md:overflow-visible">
+        <template x-for="t in tabs" :key="t.id">
+          <button @click="tab=t.id"
+            class="navitem flex items-center gap-3 pl-3.5 pr-4 py-2.5 rounded-xl text-sm font-medium text-left whitespace-nowrap"
+            :style="tab===t.id ? 'background:var(--surface);color:var(--ink)' : 'color:var(--muted)'">
+            <span class="navdot w-[3px] rounded-full"
+              :style="tab===t.id ? 'height:18px;background:var(--clay)' : 'height:0'"></span>
+            <span x-text="t.label"></span>
+          </button>
+        </template>
+      </nav>
+
+      <div class="mt-auto pt-6 hidden md:block">
+        <!-- theme toggle -->
+        <button @click="toggleTheme()"
+          class="zbtn zbtn-ghost w-full flex items-center justify-center gap-2 py-2 mb-5 text-xs font-mono tracking-wide">
+          <span x-show="theme==='claude'">&#9789;&nbsp; Night mode</span>
+          <span x-show="theme==='night'" x-cloak>&#9728;&nbsp; Claude mode</span>
+        </button>
+        <div class="hairline mb-5"></div>
+        <div class="flex items-center gap-2 mb-4">
+          <span class="relative flex h-2 w-2">
+            <span x-show="status.online" class="animate-ping absolute inline-flex h-full w-full rounded-full"
+              style="background:var(--leaf);opacity:.5"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2"
+              :style="status.online ? 'background:var(--leaf)' : 'background:var(--clay-deep)'"></span>
+          </span>
+          <span class="mono-label" :style="status.online ? 'color:var(--leaf)' : 'color:var(--clay-deep)'"
+            x-text="status.online ? 'online' : 'offline'"></span>
+        </div>
+        <div class="flex items-baseline gap-6">
+          <div>
+            <div class="font-serif text-3xl t-ink leading-none" x-text="displayTotal"></div>
+            <div class="mono-label mt-1">accounts</div>
+          </div>
+          <div>
+            <div class="font-serif text-3xl t-clay leading-none" x-text="displayActive"></div>
+            <div class="mono-label mt-1">active</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============ MAIN ============ -->
+    <main class="flex-1 min-w-0 px-6 md:px-12 py-7 md:py-11">
+      <!-- MAIN -->
+
+      <!-- command bar -->
+      <div class="rise d1 max-w-2xl mb-9 flex items-center gap-3 px-4 py-2.5 rounded-xl font-mono text-xs"
+        style="background:var(--term-bg);color:var(--term-fg)">
+        <span class="cspin t-clay" x-show="running">&#9683;</span>
+        <span class="t-clay" x-show="!running">&#10022;</span>
+        <span class="opacity-90 truncate"
+          x-text="running ? statusLine : 'yang ngasi coffe rezekinya tambah lancar :3 -zada '"></span>
+        <span class="ml-auto opacity-40 hidden sm:block">localhost:8421</span>
+      </div>
+
+      <!-- ===== ACCOUNTS ===== -->
+      <section x-show="tab==='accounts'" class="tabin">
+        <div class="flex items-start justify-between gap-6 mb-9 rise d2">
+          <div>
+            <span class="mono-label mb-3 block">Overview</span>
+            <h1 class="font-serif t-ink leading-[1.0]" style="font-weight:500;font-size:clamp(2.2rem,4.4vw,3.6rem)">
+              Automation Login<br><span class="zaccent t-clay italic">in one place.</span>
+            </h1>
+            <p class="t-muted mt-4 max-w-md leading-relaxed">Manage every 9router connection, watch credits, and run
+              automations — Zada keeps you company.</p>
+          </div>
+          <div class="zada zada-float zada-blink-host shrink-0 hidden md:block" style="width:120px;height:120px"
+            :class="petStateClass">
+            <svg class="zada-svg" viewBox="0 0 120 120" width="100%" height="100%" aria-label="Zada">
+              <ellipse class="z-glow" cx="60" cy="60" rx="52" ry="52" fill="var(--clay)" opacity="0.22" />
+              <g class="z-think" transform="translate(86,18)">
+                <circle cx="0" cy="0" r="2.6" fill="var(--muted)" />
+                <circle cx="8" cy="-3" r="2.6" fill="var(--muted)" />
+                <circle cx="16" cy="-6" r="2.6" fill="var(--muted)" />
+              </g>
+              <g class="z-zzz" transform="translate(88,24)" fill="var(--muted)" font-family="JetBrains Mono, monospace"
+                font-weight="600"><text x="0" y="0" font-size="10">z</text><text x="9" y="-9" font-size="13">Z</text>
+              </g>
+              <g class="z-stars" transform="translate(60,60)" fill="var(--amber)">
+                <path d="M-42 -26 l2.4 6 l6 2.4 l-6 2.4 l-2.4 6 l-2.4 -6 l-6 -2.4 l6 -2.4 z" />
+                <path d="M42 -18 l1.8 4.6 l4.6 1.8 l-4.6 1.8 l-1.8 4.6 l-1.8 -4.6 l-4.6 -1.8 l4.6 -1.8 z" />
+                <path d="M32 32 l1.8 4.6 l4.6 1.8 l-4.6 1.8 l-1.8 4.6 l-1.8 -4.6 l-4.6 -1.8 l4.6 -1.8 z" />
+              </g>
+              <g class="z-body">
+                <ellipse cx="60" cy="106" rx="28" ry="5" fill="#000" opacity="0.10" />
+                <g class="z-core">
+                  <path d="M60 16 C86 16 100 36 100 62 C100 90 84 108 60 108 C36 108 20 90 20 62 C20 36 34 16 60 16 Z"
+                    fill="var(--clay)" />
+                  <path
+                    d="M60 16 C86 16 100 36 100 62 C100 76 95 88 86 96 C90 86 92 74 92 62 C92 38 79 23 60 23 C41 23 28 38 28 62 C28 74 30 86 34 96 C25 88 20 76 20 62 C20 36 34 16 60 16 Z"
+                    fill="var(--clay-deep)" opacity="0.32" />
+                  <circle cx="42" cy="40" r="7" fill="#fff" opacity="0.16" />
+                  <path class="z-arm" d="M96 66 q12 4 10 16 q-6 -6 -12 -8 z" fill="var(--clay)" />
+                  <g>
+                    <circle class="z-eye" cx="48" cy="60" r="6.5" fill="#1A1915" />
+                    <circle class="z-eye" cx="72" cy="60" r="6.5" fill="#1A1915" />
+                    <circle cx="50" cy="58" r="2.1" fill="#FBFAF6" />
+                    <circle cx="74" cy="58" r="2.1" fill="#FBFAF6" />
+                  </g>
+                  <path d="M50 76 Q60 84 70 76" stroke="#1A1915" stroke-width="3.4" fill="none"
+                    stroke-linecap="round" />
+                  <ellipse cx="38" cy="74" rx="4.6" ry="3" fill="#E8A98E" opacity="0.65" />
+                  <ellipse cx="82" cy="74" rx="4.6" ry="3" fill="#E8A98E" opacity="0.65" />
+                </g>
+              </g>
+              <g class="z-sweat" transform="translate(88,48)">
+                <path d="M0 0 C-3.4 5.6 -3.4 10 0 10 C3.4 10 3.4 5.6 0 0 Z" fill="#7FB5D6" />
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- stat strip -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-7 rise d3">
+          <div class="card p-4">
+            <div class="mono-label mb-1">Total</div>
+            <div class="font-serif text-3xl t-ink" x-text="status.total||0"></div>
+          </div>
+          <div class="card p-4">
+            <div class="mono-label mb-1">Active</div>
+            <div class="font-serif text-3xl t-clay" x-text="status.active||0"></div>
+          </div>
+          <div class="card p-4">
+            <div class="mono-label mb-1">9router</div>
+            <div class="font-serif text-2xl" :style="status.online?'color:var(--leaf)':'color:var(--clay-deep)'"
+              x-text="status.online?'Online':'Offline'"></div>
+          </div>
+          <div class="card p-4">
+            <div class="mono-label mb-1">Providers</div>
+            <div class="font-serif text-3xl t-ink" x-text="Object.keys(status.byProvider||{}).length"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mb-4 rise d4">
+          <span class="text-sm t-muted" x-text="accounts.length + ' connections registered'"></span>
+          <div class="flex items-center gap-2">
+            <button @click="testAll()" :disabled="testingAll || accounts.length===0"
+              class="zbtn zbtn-ghost px-3 py-1.5 text-sm flex items-center gap-1.5">
+              <span :class="testingAll && 'spin'">&#10227;</span> <span
+                x-text="testingAll ? 'Testing…' : 'Test all'"></span>
+            </button>
+            <button @click="loadAccounts()" class="zbtn zbtn-ghost px-3 py-1.5 text-sm flex items-center gap-1.5">
+              <span :class="busy.accounts && 'spin'">&#x21bb;</span> Refresh
+            </button>
+            <div class="relative group">
+              <button @click="deleteAll()" :disabled="!accounts.some(a => a.testStatus==='error')"
+                class="zbtn px-3 py-1.5 text-sm flex items-center gap-1.5"
+                style="background:rgba(168,77,48,.14);color:var(--clay-deep)">
+                <span>&#128465;</span> Delete error
+              </button>
+              <div class="zada-tip">Deletes only connections showing ERR (expired/limited tokens).
+                Re-register them from the Run tab.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card overflow-hidden rise d5">
+          <table class="w-full text-sm">
+            <thead style="background:var(--surface-2)">
+              <tr>
+                <th class="text-left px-5 py-3.5 mono-label">Email</th>
+                <th class="text-left px-5 py-3.5 mono-label">Provider</th>
+                <th class="text-left px-5 py-3.5 mono-label">Status</th>
+                <th class="text-center px-5 py-3.5 mono-label">Active</th>
+                <th class="text-right px-5 py-3.5 mono-label">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="a in accounts" :key="a.id">
+                <tr style="border-top:1px solid var(--line)">
+                  <td class="px-5 py-3.5 font-medium t-ink" x-text="a.email"></td>
+                  <td class="px-5 py-3.5"><span class="chip chip-neutral" x-text="a.provider"></span></td>
+                  <td class="px-5 py-3.5"><span class="chip"
+                      :class="a.testStatus==='active'?'chip-ok':a.testStatus==='error'?'chip-err':'chip-neutral'"
+                      x-text="a.testStatus==='active'?'OK':a.testStatus==='error'?'ERR':'?'"></span></td>
+                  <td class="px-5 py-3.5 text-center">
+                    <button @click="toggle(a)" class="zswitch align-middle"
+                      :style="a.isActive?'background:var(--leaf)':'background:var(--line)'">
+                      <span class="knob" :style="a.isActive?'left:22px':'left:2px'"></span>
+                    </button>
+                  </td>
+                  <td class="px-5 py-3.5 text-right whitespace-nowrap">
+                    <button @click="testConn(a)" class="zbtn zbtn-ghost text-xs px-2.5 py-1.5">Test</button>
+                    <button @click="del(a)" class="zbtn text-xs px-2.5 py-1.5"
+                      style="background:rgba(168,77,48,.12);color:var(--clay-deep)">Delete</button>
+                  </td>
+                </tr>
+              </template>
+              <tr x-show="accounts.length===0">
+                <td colspan="5" class="px-5 py-12 text-center t-muted">No data yet. Make sure 9router is running.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== CREDITS ===== -->
+      <section x-show="tab==='credits'" class="tabin">
+        <div class="mb-8">
+          <span class="mono-label mb-3 block">Antigravity Quota</span>
+          <h1 class="font-serif t-ink leading-[1.0]" style="font-weight:500;font-size:clamp(2.2rem,4.4vw,3.6rem)">
+            Credits <span class="zaccent t-clay italic">remaining.</span></h1>
+        </div>
+
+        <!-- Round-robin strategy -->
+        <div class="card p-5 mb-6">
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <div class="mono-label mb-1">Rotation</div>
+              <h3 class="font-serif text-xl t-ink mb-1">Round-robin mode</h3>
+              <p class="text-sm t-muted max-w-md leading-relaxed">Rotate requests across antigravity accounts. Sticky
+                limit = how many requests stay on one account before switching.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button @click="rr.fallbackStrategy = (rr.fallbackStrategy==='round-robin' ? 'priority' : 'round-robin')"
+                class="zswitch"
+                :style="rr.fallbackStrategy==='round-robin'?'background:var(--leaf)':'background:var(--line)'">
+                <span class="knob" :style="rr.fallbackStrategy==='round-robin'?'left:22px':'left:2px'"></span>
+              </button>
+              <span class="text-sm font-medium t-soft"
+                x-text="rr.fallbackStrategy==='round-robin' ? 'On' : 'Off'"></span>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 mt-4 flex-wrap">
+            <label class="text-sm t-soft">Sticky limit</label>
+            <input type="number" min="1" max="100" x-model.number="rr.stickyRoundRobinLimit"
+              class="zinput w-20 px-2 py-1.5 text-center font-mono" />
+            <button @click="saveStrategy()" :disabled="rrBusy" class="zbtn zbtn-primary px-4 py-2 text-sm ml-auto">
+              <span x-text="rrBusy ? 'Saving…' : 'Save rotation'"></span>
+            </button>
+            <span class="text-xs font-medium" :style="rrMsgOk?'color:var(--leaf)':'color:var(--clay-deep)'"
+              x-text="rrMsg"></span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-sm t-muted" x-show="busy.credits"><span class="spin">&#x21bb;</span> fetching in
+            parallel…</span>
+          <span class="text-sm t-muted" x-show="!busy.credits" x-text="credits.length + ' accounts'"></span>
+          <button @click="loadCredits()" class="zbtn zbtn-ghost px-3 py-1.5 text-sm flex items-center gap-1.5"><span
+              :class="busy.credits && 'spin'">&#x21bb;</span> Refresh</button>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-5">
+          <template x-for="c in credits" :key="c.email">
+            <div class="card lift p-5">
+              <div class="flex items-center justify-between mb-4">
+                <div class="min-w-0">
+                  <div class="font-semibold t-ink truncate" x-text="c.email"></div>
+                  <div class="text-xs t-muted" x-text="'Plan: '+c.plan"></div>
+                </div>
+                <span class="chip shrink-0" :class="c.isActive?'chip-ok':'chip-neutral'"
+                  x-text="c.isActive?'active':'inactive'"></span>
+              </div>
+              <template x-for="m in c.models" :key="m.name">
+                <div class="mb-2.5">
+                  <div class="flex justify-between text-xs mb-1">
+                    <span :class="m.gemini?'font-semibold t-clay':'t-soft'" x-text="m.name"></span>
+                    <span class="t-muted font-mono" x-text="m.unlimited?'unlimited':(m.remaining+'/'+m.total)"></span>
+                  </div>
+                  <div class="h-2 bar-track">
+                    <div class="bar-fill"
+                      :style="'width:'+(m.unlimited?100:m.pct)+'%;background:'+(m.pct>=50?'var(--leaf)':m.pct>=20?'var(--amber)':'var(--clay-deep)')">
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </template>
+          <div x-show="credits.length===0 && !busy.credits" class="t-muted text-sm">No data yet. Click Refresh.</div>
+        </div>
+      </section>
+
+      <!-- ===== RUN + TERMINAL ===== -->
+      <section x-show="tab==='run'" class="tabin">
+        <div class="mb-8">
+          <span class="mono-label mb-3 block">Automation</span>
+          <h1 class="font-serif t-ink leading-[1.0]" style="font-weight:500;font-size:clamp(2.2rem,4.4vw,3.6rem)">Run
+            &amp; <span class="zaccent t-clay italic">watch.</span></h1>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4 mb-8">
+          <div class="card card-2 lift p-6">
+            <div class="mono-label t-clay mb-3">01 / gmail</div>
+            <h3 class="font-serif text-2xl t-ink mb-1.5">Gmail Login</h3>
+            <p class="text-sm t-muted mb-5 leading-relaxed">Bulk-login every account in accounts.txt, headless.</p>
+            <button @click="run('gmail')" :disabled="running" class="zbtn zbtn-primary w-full py-3">
+              <span x-text="running && current==='gmail' ? 'Running…' : 'Run'"></span>
+            </button>
+          </div>
+          <div class="card card-2 lift p-6">
+            <div class="mono-label t-clay mb-3">02 / antigravity</div>
+            <h3 class="font-serif text-2xl t-ink mb-1.5">Register Antigravity</h3>
+            <p class="text-sm t-muted mb-3 leading-relaxed">Register accounts into 9router. Browser shows for consent.
+            </p>
+            <div class="flex items-center gap-2 mb-4">
+              <label class="text-sm t-soft">Parallel Chrome</label>
+              <input type="number" x-model="workers" min="1" max="6"
+                class="zinput w-16 px-2 py-1.5 text-center font-mono" />
+            </div>
+            <button @click="run('antigravity')" :disabled="running" class="zbtn zbtn-dark w-full py-3">
+              <span x-text="running && current==='antigravity' ? 'Running…' : 'Run'"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- macOS terminal -->
+        <div class="flex items-center justify-between mb-3">
+          <span class="mono-label">Live Terminal</span>
+          <button @click="run('install')" :disabled="running"
+            class="zbtn zbtn-ghost px-3.5 py-2 text-sm flex items-center gap-2">
+            <span>&#11015;</span> <span
+              x-text="running && current==='install' ? 'Installing…' : 'Install requirements'"></span>
+          </button>
+        </div>
+        <div class="mac-win">
+          <div class="mac-bar">
+            <span class="mac-dot mac-red"></span><span class="mac-dot mac-yellow"></span><span
+              class="mac-dot mac-green"></span>
+            <span class="mac-title mx-auto pr-12 flex items-center gap-2">
+              <span x-show="running" class="cspin t-clay">&#9683;</span>
+              zada@9router — -zsh
+            </span>
+          </div>
+          <div class="mac-body px-5 py-4 h-[24rem] overflow-y-auto text-[12.5px] leading-relaxed" id="termbox">
+            <div class="opacity-40 mb-2">Last login: live session on ttys001</div>
+            <template x-for="(l,i) in termLines" :key="i">
+              <div class="tline whitespace-pre-wrap flex gap-2">
+                <span class="shrink-0" :style="markerStyle(l)" x-text="marker(l)"></span>
+                <span :style="lineStyle(l)" x-text="l"></span>
+              </div>
+            </template>
+            <div class="flex items-center gap-2 mt-1" x-show="running">
+              <span style="color:var(--leaf)">&#10095;</span><span class="cspin t-clay">&#9683;</span>
+              <span class="opacity-50" x-text="statusLine || 'working…'"></span>
+            </div>
+            <div class="flex items-center gap-2 mt-1" x-show="!running">
+              <span style="color:var(--leaf)">&#10095;</span><span class="cursor-blk blink"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== EDITOR ===== -->
+      <section x-show="tab==='editor'" class="tabin">
+        <div class="mb-8">
+          <span class="mono-label mb-3 block">Configuration</span>
+          <h1 class="font-serif t-ink leading-[1.0]" style="font-weight:500;font-size:clamp(2.2rem,4.4vw,3.6rem)">
+            accounts</h1>
+        </div>
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm t-muted">Format: <code class="font-mono t-clay">email:password</code> or <code
+              class="font-mono t-clay">email|password</code></p>
+          <button @click="saveFile()" class="zbtn zbtn-primary px-4 py-2 text-sm">Save</button>
+        </div>
+        <textarea x-model="fileContent" spellcheck="false"
+          class="card zinput w-full h-[24rem] p-5 font-mono text-sm resize-none leading-relaxed"></textarea>
+        <p class="text-xs mt-3 font-medium" :style="fileMsgOk?'color:var(--leaf)':'color:var(--clay-deep)'"
+          x-text="fileMsg"></p>
+      </section>
+
+      <!-- ===== AUTO-OFFLINE ===== -->
+      <section x-show="tab==='auto'" class="tabin">
+        <div class="mb-8">
+          <span class="mono-label mb-3 block">Automatic</span>
+          <h1 class="font-serif t-ink leading-[1.0]" style="font-weight:500;font-size:clamp(2.2rem,4.4vw,3.6rem)">
+            Auto-Rotate <span class="zaccent t-clay italic">Gemini.</span></h1>
+        </div>
+        <div class="card p-7">
+          <div class="flex items-center gap-3 mb-5">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full"
+                style="background:var(--leaf);opacity:.5"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5" style="background:var(--leaf)"></span>
+            </span>
+            <span class="font-serif text-xl t-ink">Embedded &amp; active inside 9router</span>
+          </div>
+          <p class="text-[15px] t-soft leading-relaxed mb-6 max-w-2xl">
+            A module runs automatically inside the 9router process. When an account's <b class="t-clay">Gemini</b>
+            credit runs out,
+            its connection is set <b>offline</b> automatically. When credit recovers after reset, it's switched back
+            <b>online</b>.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="card card-2 p-4">
+              <div class="mono-label mb-1.5">Watching</div>
+              <div class="font-serif text-lg t-ink">Gemini models</div>
+            </div>
+            <div class="card card-2 p-4">
+              <div class="mono-label mb-1.5">Interval</div>
+              <div class="font-serif text-lg t-ink">120 seconds</div>
+            </div>
+            <div class="card card-2 p-4">
+              <div class="mono-label mb-1.5">Auto-online</div>
+              <div class="font-serif text-lg" style="color:var(--leaf)">enabled</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== FOOTER: donate + community ===== -->
+      <footer class="mt-12 pt-7" style="border-top:1px solid var(--line)">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-xs t-muted font-mono">Zada · 9router</div>
+          <div class="flex items-center gap-3">
+            <a href="https://saweria.co/lforLexxy" target="_blank" rel="noopener"
+              class="zbtn zbtn-primary px-4 py-2.5 text-sm flex items-center gap-2">
+              <span>&#9749;</span> Give me a coffee
+            </a>
+            <a href="https://discord.gg/zhP6vhfzAQ" target="_blank" rel="noopener"
+              class="zbtn zbtn-ghost px-4 py-2.5 text-sm flex items-center gap-2">
+              <span>&#128172;</span> Join community
+            </a>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ============ CORNER PET ============ -->
+  <div class="zada-corner" @click="poke()">
+    <div class="zada-bubble" :class="bubble && 'show'" x-text="bubble"></div>
+    <div class="zada zada-float zada-blink-host" style="width:80px;height:80px" :class="petStateClass">
+      <svg class="zada-svg" viewBox="0 0 120 120" width="100%" height="100%" aria-label="Zada">
+        <ellipse class="z-glow" cx="60" cy="60" rx="52" ry="52" fill="var(--clay)" opacity="0.25" />
+        <g class="z-think" transform="translate(86,18)">
+          <circle cx="0" cy="0" r="2.6" fill="var(--muted)" />
+          <circle cx="8" cy="-3" r="2.6" fill="var(--muted)" />
+          <circle cx="16" cy="-6" r="2.6" fill="var(--muted)" />
+        </g>
+        <g class="z-zzz" transform="translate(88,24)" fill="var(--muted)" font-family="JetBrains Mono, monospace"
+          font-weight="600">
+          <text x="0" y="0" font-size="10">z</text><text x="9" y="-9" font-size="13">Z</text>
+        </g>
+        <g class="z-stars" transform="translate(60,60)" fill="var(--amber)">
+          <path d="M-42 -26 l2.4 6 l6 2.4 l-6 2.4 l-2.4 6 l-2.4 -6 l-6 -2.4 l6 -2.4 z" />
+          <path d="M42 -18 l1.8 4.6 l4.6 1.8 l-4.6 1.8 l-1.8 4.6 l-1.8 -4.6 l-4.6 -1.8 l4.6 -1.8 z" />
+          <path d="M32 32 l1.8 4.6 l4.6 1.8 l-4.6 1.8 l-1.8 4.6 l-1.8 -4.6 l-4.6 -1.8 l4.6 -1.8 z" />
+        </g>
+        <g class="z-body">
+          <ellipse cx="60" cy="106" rx="28" ry="5" fill="#000" opacity="0.10" />
+          <g class="z-core">
+            <path d="M60 16 C86 16 100 36 100 62 C100 90 84 108 60 108 C36 108 20 90 20 62 C20 36 34 16 60 16 Z"
+              fill="var(--clay)" />
+            <path
+              d="M60 16 C86 16 100 36 100 62 C100 76 95 88 86 96 C90 86 92 74 92 62 C92 38 79 23 60 23 C41 23 28 38 28 62 C28 74 30 86 34 96 C25 88 20 76 20 62 C20 36 34 16 60 16 Z"
+              fill="var(--clay-deep)" opacity="0.32" />
+            <circle cx="42" cy="40" r="7" fill="#fff" opacity="0.16" />
+            <path class="z-arm" d="M96 66 q12 4 10 16 q-6 -6 -12 -8 z" fill="var(--clay)" />
+            <g>
+              <circle class="z-eye" cx="48" cy="60" r="6.5" fill="#1A1915" />
+              <circle class="z-eye" cx="72" cy="60" r="6.5" fill="#1A1915" />
+              <circle cx="50" cy="58" r="2.1" fill="#FBFAF6" />
+              <circle cx="74" cy="58" r="2.1" fill="#FBFAF6" />
+            </g>
+            <path d="M50 76 Q60 84 70 76" stroke="#1A1915" stroke-width="3.4" fill="none" stroke-linecap="round" />
+            <ellipse cx="38" cy="74" rx="4.6" ry="3" fill="#E8A98E" opacity="0.65" />
+            <ellipse cx="82" cy="74" rx="4.6" ry="3" fill="#E8A98E" opacity="0.65" />
+          </g>
+        </g>
+        <g class="z-sweat" transform="translate(88,48)">
+          <path d="M0 0 C-3.4 5.6 -3.4 10 0 10 C3.4 10 3.4 5.6 0 0 Z" fill="#7FB5D6" />
+        </g>
+      </svg>
+    </div>
+  </div>
+  <!-- ============ FIRST-RUN GATE ============ -->
+  <div x-show="!setupDone" x-cloak class="fixed inset-0 z-[80] flex items-center justify-center p-5"
+    style="background:rgba(10,10,14,.86);backdrop-filter:blur(6px)">
+    <div class="card w-full max-w-lg p-7">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="zada zada-float" style="width:54px;height:54px">
+          <svg class="zada-svg" viewBox="0 0 120 120" width="100%" height="100%">
+            <g class="z-body">
+              <g class="z-core">
+                <path d="M60 16 C86 16 100 36 100 62 C100 90 84 108 60 108 C36 108 20 90 20 62 C20 36 34 16 60 16 Z"
+                  fill="var(--clay)" />
+                <circle class="z-eye" cx="48" cy="60" r="6.5" fill="#1A1915" />
+                <circle class="z-eye" cx="72" cy="60" r="6.5" fill="#1A1915" />
+                <path d="M50 76 Q60 84 70 76" stroke="#1A1915" stroke-width="3.4" fill="none" stroke-linecap="round" />
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div>
+          <h2 class="font-serif text-2xl t-ink leading-none" style="font-weight:500">Welcome to Zada</h2>
+          <p class="mono-label mt-1.5">First-time setup</p>
+        </div>
+      </div>
+      <p class="text-sm t-soft leading-relaxed mb-5">Before the first run, install the required tools (Flask,
+        undetected-chromedriver, Selenium, requests). Progress shows live in the terminal below.</p>
+      <button @click="runSetup()" :disabled="running" class="zbtn zbtn-primary w-full py-3 mb-4">
+        <span x-text="running ? 'Installing…' : 'Install requirements'"></span>
+      </button>
+      <div class="mac-win" x-show="setupLog.length>0" x-cloak>
+        <div class="mac-bar"><span class="mac-dot mac-red"></span><span class="mac-dot mac-yellow"></span><span
+            class="mac-dot mac-green"></span><span class="mac-title mx-auto pr-12">setup — pip install</span></div>
+        <div class="mac-body px-4 py-3 h-44 overflow-y-auto text-[11.5px] leading-relaxed" id="setupbox">
+          <template x-for="(l,i) in setupLog" :key="i">
+            <div class="tline whitespace-pre-wrap" :style="lineStyle(l)" x-text="l"></div>
+          </template>
+        </div>
+      </div>
+      <button @click="skipSetup()" class="text-xs t-muted hover:t-clay mt-4 font-mono">Skip — I already
+        installed</button>
+    </div>
+  </div>
+</body>
+
+</html>

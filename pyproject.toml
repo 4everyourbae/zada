@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zada"
+version = "1.0.0"
+description = "Zada — Claude Companion control panel for 9router + Antigravity"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Zada" }]
+keywords = ["9router", "antigravity", "claude", "cli", "automation"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+]
+dependencies = [
+    "flask>=3.0.0",
+    "undetected-chromedriver>=3.5.5",
+    "selenium>=4.41.0",
+    "requests>=2.31.0",
+    "pystray>=0.19.5",
+    "pillow>=10.0.0",
+    "setuptools>=68.0.0; python_version >= '3.12'",
+]
+
+[project.scripts]
+zada = "zada.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/USERNAME/zada"
+Issues = "https://github.com/USERNAME/zada/issues"
+
+[tool.setuptools]
+packages = ["zada"]
+
+[tool.setuptools.package-data]
+zada = [
+    "templates/*.html",
+    "static/*.css",
+    "static/*.js",
+    "static/assets/*",
+]
