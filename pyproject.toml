@@ -1,11 +1,11 @@
-﻿[build-system]
+[build-system]
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "zada"
 version = "1.0.0"
-description = "Zada â€” Claude Companion control panel for 9router + Antigravity"
+description = "Zada — Automation Tools control panel for 9router + Antigravity"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

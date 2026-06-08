@@ -1,7 +1,7 @@
-﻿{
+{
   "name": "@lexxybrian/zada",
   "version": "1.0.0",
-  "description": "Zada â€” Claude Companion control panel for 9router + Antigravity (npm wrapper for the Python tool)",
+  "description": "Zada — Automation Tools control panel for 9router + Antigravity (npm wrapper for the Python tool)",
   "bin": {
     "zada": "bin/zada.js"
   },

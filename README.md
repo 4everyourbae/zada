@@ -1,4 +1,4 @@
-﻿# Zada â€” Claude Companion
+# Zada — Automation Tools
 
 Control panel lokal untuk mengelola akun **9router + Antigravity**: login Gmail
 otomatis, daftar OAuth Antigravity, cek credit/quota, dan kelola koneksi lewat
@@ -42,10 +42,10 @@ Cukup ketik di terminal/CMD:
 zada
 ```
 
-Lalu pilih dengan panah â†‘/â†“:
+Lalu pilih dengan panah ↑/↓:
 
-- **Run in this terminal** â€” jalankan dashboard di foreground, browser kebuka otomatis.
-- **Run in background** â€” jalankan di system tray (ikon Claude pet).
+- **Run in this terminal** — jalankan dashboard di foreground, browser kebuka otomatis.
+- **Run in background** — jalankan di system tray (ikon pet).
 - **Quit**
 
 Argumen langsung juga didukung:

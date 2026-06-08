@@ -47,10 +47,10 @@ function zada() {
     // ---------- theme ----------
     applyTheme() {
       document.body.classList.toggle("t-night", this.theme === "night");
-      document.body.classList.toggle("t-claude", this.theme !== "night");
+      document.body.classList.toggle("t-day", this.theme !== "night");
     },
     toggleTheme() {
-      this.theme = this.theme === "claude" ? "night" : "claude";
+      this.theme = this.theme === "day" ? "night" : "day";
       try { localStorage.setItem("zada-theme", this.theme); } catch (e) { }
       this.applyTheme();
     },

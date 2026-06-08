@@ -2,7 +2,7 @@
 
 Type `zada` -> pick with UP/DOWN arrows, ENTER to confirm:
   - Run in this terminal (foreground)
-  - Run in background + system tray (Claude pet icon)
+  - Run in background + system tray (pet icon)
   - Quit
 """
 import os
@@ -24,7 +24,7 @@ PORT = 8421
 URL = "http://localhost:{}".format(PORT)
 ICON = paths.ICON_FILE
 
-# ---------- ANSI colors (Claude clay/orange palette) ----------
+# ---------- ANSI colors (clay/orange palette) ----------
 RESET = "\x1b[0m"
 ORANGE = "\x1b[38;2;217;119;87m"      # clay/orange
 ORANGE_B = "\x1b[1;38;2;217;119;87m"
@@ -73,7 +73,7 @@ BANNER = r"""
 def draw(items, idx, msg=""):
     clear()
     print(ORANGE_B + BANNER + RESET)
-    print("   " + ORANGE + "Claude Companion" + RESET + DIM + "  ·  9router control  ·  localhost:8421" + RESET)
+    print("   " + ORANGE + "Automation Tools" + RESET + DIM + "  ·  9router control  ·  localhost:8421" + RESET)
     print("   " + DIM + "─" * 52 + RESET)
     print()
     for i, (label, desc) in enumerate(items):
@@ -205,7 +205,7 @@ def run_tray():
         pystray.MenuItem("Open Zada Dashboard", on_open, default=True),
         pystray.MenuItem("Quit Zada", on_quit),
     )
-    icon = pystray.Icon("zada", image, "Zada — Claude Companion", menu_obj)
+    icon = pystray.Icon("zada", image, "Zada — Automation Tools", menu_obj)
     clear()
     print(ORANGE_B + BANNER + RESET)
     print("   " + ORANGE + "Running in tray" + RESET + DIM + "  ·  right-click the pet icon" + RESET)
@@ -215,7 +215,7 @@ def run_tray():
 
 def main():
     _enable_ansi()
-    _set_title("Zada — Claude Companion")
+    _set_title("Zada — Automation Tools")
     paths.ensure_data_files()
 
     args = [a.lower() for a in sys.argv[1:]]
